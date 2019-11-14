@@ -11,6 +11,7 @@ router.post('/register', (req, res) => {
   Users.add(userInfo)
     .then(newUser => {
       const token = generateToken(newUser);
+      console.log(token);
       res.status(201).json(newUser)
     })
     .catch(error => {
@@ -27,6 +28,7 @@ router.post('/login', (req, res) => {
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
         const token = generateToken(user);
+        console.log(token)
         res.status(200).json({
           message: `Welcome ${user.username}`,
           token
@@ -39,6 +41,23 @@ router.post('/login', (req, res) => {
       res.status(500).json(error);
     });
 
+})
+
+
+router.get('/logout', (req, res) => {
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        res.json({ message: 'there was a problem logging you out.' })
+      } else {
+        console.log("LOGOUT YOU ARE LOGGED OUT")
+        res.sendStatus(204);
+      }
+    })
+  } else {
+    console.log("LOGOUT YOU WEREN'T LOGGED IN")
+    res.status(200).json({ message: "You weren't logged in" })
+  }
 })
 
 
